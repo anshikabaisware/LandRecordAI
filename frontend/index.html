@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Land Record AI</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background: #f4f6f8;
+
+            margin: 0;
+
+            padding: 40px;
+
+        }
+
+
+        .container {
+
+            max-width: 1000px;
+
+            margin: auto;
+
+        }
+
+
+        h1 {
+
+            text-align: center;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .subtitle {
+
+            text-align: center;
+
+            color: #666;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .upload-box {
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.08);
+
+        }
+
+
+        input[type="file"] {
+
+            padding: 10px;
+
+        }
+
+
+        button {
+
+            padding: 12px 25px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+            background: #2563eb;
+
+            color: white;
+
+        }
+
+
+        button:hover {
+
+            background: #1d4ed8;
+
+        }
+
+
+        .approve-btn {
+
+            background: #16a34a;
+
+            margin-top: 10px;
+
+        }
+
+
+        .approve-btn:hover {
+
+            background: #15803d;
+
+        }
+
+
+        .refresh-btn {
+
+            background: #2563eb;
+
+        }
+
+
+        .card {
+
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.08);
+
+        }
+
+
+        .card h2 {
+
+            margin-top: 0;
+
+        }
+
+
+        .field {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 14px 5px;
+
+            border-bottom:
+                1px solid #ddd;
+
+        }
+
+
+        .field:last-child {
+
+            border-bottom: none;
+
+        }
+
+
+        .field-name {
+
+            font-weight: bold;
+
+        }
+
+
+        input[type="text"] {
+
+            padding: 9px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 6px;
+
+            width: 250px;
+
+            font-size: 15px;
+
+        }
+
+
+        .confidence {
+
+            font-weight: bold;
+
+        }
+
+
+        .high {
+
+            color: #16a34a;
+
+        }
+
+
+        .low {
+
+            color: #ea580c;
+
+        }
+
+
+        .status-box {
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin-top: 10px;
+
+            font-weight: bold;
+
+        }
+
+
+        .success {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+
+        .warning {
+
+            background: #ffedd5;
+
+            color: #9a3412;
+
+        }
+
+
+        #result {
+
+            display: none;
+
+        }
+
+
+        #status {
+
+            text-align: center;
+
+            margin: 20px;
+
+            font-weight: bold;
+
+        }
+
+
+        #approved {
+
+            color: #16a34a;
+
+            font-weight: bold;
+
+            margin-top: 15px;
+
+        }
+
+
+        .loading {
+
+            color: #2563eb;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        th {
+
+            background: #f4f6f8;
+
+            padding: 12px;
+
+            text-align: left;
+
+        }
+
+
+        td {
+
+            padding: 12px;
+
+            border-bottom:
+                1px solid #ddd;
+
+        }
+
+
+        .approved-status {
+
+            color: #16a34a;
+
+            font-weight: bold;
+
+        }
+
+
+        .table-wrapper {
+
+            overflow-x: auto;
+
+            margin-top: 20px;
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            body {
+
+                padding: 15px;
+
+            }
+
+
+            .field {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 8px;
+
+            }
+
+
+            input[type="text"] {
+
+                width: 100%;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <h1>
+        Land Record AI
+    </h1>
+
+
+    <div class="subtitle">
+
+        Intelligent Land Record
+        Digitization & Validation System
+
+    </div>
+
+
+    <!-- =====================================
+         UPLOAD
+    ====================================== -->
+
+    <div class="upload-box">
+
+        <h2>
+            Upload Land Record
+        </h2>
+
+
+        <p>
+            Upload a PDF, JPG or PNG land record
+        </p>
+
+
+        <input
+            type="file"
+            id="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+        >
+
+
+        <br>
+        <br>
+
+
+        <button
+            onclick="processFile()"
+        >
+
+            Process Record
+
+        </button>
+
+    </div>
+
+
+    <!-- =====================================
+         STATUS
+    ====================================== -->
+
+    <div id="status"></div>
+
+
+    <!-- =====================================
+         RESULTS
+    ====================================== -->
+
+    <div id="result">
+
+
+        <!-- =================================
+             EXTRACTED RECORD
+        ================================== -->
+
+        <div class="card">
+
+            <h2>
+                Extracted Land Record
+            </h2>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Owner Name
+                </span>
+
+
+                <input
+                    type="text"
+                    id="owner"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Survey Number
+                </span>
+
+
+                <input
+                    type="text"
+                    id="survey"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Land Area
+                </span>
+
+
+                <input
+                    type="text"
+                    id="area"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Location
+                </span>
+
+
+                <input
+                    type="text"
+                    id="location"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             CONFIDENCE
+        ================================== -->
+
+        <div class="card">
+
+            <h2>
+                Confidence Score
+            </h2>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Owner Name
+                </span>
+
+
+                <span
+                    id="ownerConfidence"
+                    class="confidence"
+                ></span>
+
+            </div>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Survey Number
+                </span>
+
+
+                <span
+                    id="surveyConfidence"
+                    class="confidence"
+                ></span>
+
+            </div>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Land Area
+                </span>
+
+
+                <span
+                    id="areaConfidence"
+                    class="confidence"
+                ></span>
+
+            </div>
+
+
+            <div class="field">
+
+                <span class="field-name">
+                    Location
+                </span>
+
+
+                <span
+                    id="locationConfidence"
+                    class="confidence"
+                ></span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             VALIDATION
+        ================================== -->
+
+        <div class="card">
+
+            <h2>
+                Validation Status
+            </h2>
+
+
+            <div
+                id="validation"
+                class="status-box"
+            ></div>
+
+
+            <button
+                class="approve-btn"
+                onclick="approveRecord()"
+            >
+
+                Approve Record
+
+            </button>
+
+
+            <p id="approved"></p>
+
+        </div>
+
+
+        <!-- =================================
+             OCR TEXT
+        ================================== -->
+
+        <div class="card">
+
+            <h2>
+                OCR Extracted Text
+            </h2>
+
+
+            <pre
+                id="ocrText"
+                style="
+                    white-space: pre-wrap;
+                    background: #f4f4f4;
+                    padding: 15px;
+                    border-radius: 8px;
+                    overflow-x: auto;
+                "
+            ></pre>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================
+         SAVED RECORDS
+    ====================================== -->
+
+    <div class="card">
+
+        <h2>
+            Saved Land Records
+        </h2>
+
+
+        <button
+            class="refresh-btn"
+            onclick="loadRecords()"
+        >
+
+            Refresh Records
+
+        </button>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Owner
+                        </th>
+
+                        <th>
+                            Survey No.
+                        </th>
+
+                        <th>
+                            Area
+                        </th>
+
+                        <th>
+                            Location
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="recordsBody"
+                >
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            style="
+                                text-align:center;
+                                color:#666;
+                            "
+                        >
+
+                            Click
+                            "Refresh Records"
+                            to load saved records.
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================================
+   PROCESS FILE
+========================================= */
+
+async function processFile() {
+
+    const fileInput =
+        document.getElementById("file");
+
+
+    if (!fileInput.files.length) {
+
+        alert(
+            "Please select a land record first."
+        );
+
+        return;
+
+    }
+
+
+    const file =
+        fileInput.files[0];
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    document.getElementById(
+        "status"
+    ).innerText =
+        "Processing document...";
+
+
+    document.getElementById(
+        "status"
+    ).className =
+        "loading";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:8000/upload",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server returned error: " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Server response:",
+            data
+        );
+
+
+        const record =
+            data.record;
+
+
+        const validation =
+            data.validation;
+
+
+        /* Display fields */
+
+        document.getElementById(
+            "owner"
+        ).value =
+            record.owner_name;
+
+
+        document.getElementById(
+            "survey"
+        ).value =
+            record.survey_number;
+
+
+        document.getElementById(
+            "area"
+        ).value =
+            record.land_area;
+
+
+        document.getElementById(
+            "location"
+        ).value =
+            record.location;
+
+
+        /* OCR */
+
+        document.getElementById(
+            "ocrText"
+        ).innerText =
+            data.ocr_text;
+
+
+        /* Confidence */
+
+        setConfidence(
+            "ownerConfidence",
+            validation.confidence.owner_name
+        );
+
+
+        setConfidence(
+            "surveyConfidence",
+            validation.confidence.survey_number
+        );
+
+
+        setConfidence(
+            "areaConfidence",
+            validation.confidence.land_area
+        );
+
+
+        setConfidence(
+            "locationConfidence",
+            validation.confidence.location
+        );
+
+
+        /* Validation */
+
+        const validationBox =
+            document.getElementById(
+                "validation"
+            );
+
+
+        if (
+            validation.human_review_required
+        ) {
+
+            validationBox.innerText =
+                "Human Review Required";
+
+
+            validationBox.className =
+                "status-box warning";
+
+        }
+
+        else {
+
+            validationBox.innerText =
+                "Record Automatically Validated";
+
+
+            validationBox.className =
+                "status-box success";
+
+        }
+
+
+        /* Show results */
+
+        document.getElementById(
+            "result"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "Processing Complete";
+
+
+        document.getElementById(
+            "status"
+        ).className =
+            "";
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "Error processing document";
+
+
+        alert(
+            "Could not process the document.\n\n" +
+            "Make sure FastAPI is running."
+        );
+
+    }
+
+}
+
+
+
+/* =========================================
+   CONFIDENCE DISPLAY
+========================================= */
+
+function setConfidence(
+    elementId,
+    score
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    const percentage =
+        Math.round(
+            score * 100
+        );
+
+
+    element.innerText =
+        percentage + "%";
+
+
+    if (score >= 0.80) {
+
+        element.className =
+            "confidence high";
+
+    }
+
+    else {
+
+        element.className =
+            "confidence low";
+
+    }
+
+}
+
+
+
+/* =========================================
+   APPROVE + SAVE RECORD
+========================================= */
+
+async function approveRecord() {
+
+
+    const owner =
+        document.getElementById(
+            "owner"
+        ).value.trim();
+
+
+    const survey =
+        document.getElementById(
+            "survey"
+        ).value.trim();
+
+
+    const area =
+        document.getElementById(
+            "area"
+        ).value.trim();
+
+
+    const location =
+        document.getElementById(
+            "location"
+        ).value.trim();
+
+
+    /* Check fields */
+
+    if (
+        !owner ||
+        !survey ||
+        !area ||
+        !location
+    ) {
+
+        alert(
+            "Please make sure all fields are filled."
+        );
+
+        return;
+
+    }
+
+
+    /* Confidence */
+
+    const ownerConfidence =
+        parseFloat(
+            document.getElementById(
+                "ownerConfidence"
+            ).innerText
+        ) / 100;
+
+
+    const surveyConfidence =
+        parseFloat(
+            document.getElementById(
+                "surveyConfidence"
+            ).innerText
+        ) / 100;
+
+
+    const areaConfidence =
+        parseFloat(
+            document.getElementById(
+                "areaConfidence"
+            ).innerText
+        ) / 100;
+
+
+    const locationConfidence =
+        parseFloat(
+            document.getElementById(
+                "locationConfidence"
+            ).innerText
+        ) / 100;
+
+
+    /* OCR */
+
+    const ocrText =
+        document.getElementById(
+            "ocrText"
+        ).innerText;
+
+
+    /* Create record */
+
+    const approvedRecord = {
+
+        owner_name:
+            owner,
+
+        survey_number:
+            survey,
+
+        land_area:
+            area,
+
+        location:
+            location,
+
+        ocr_text:
+            ocrText,
+
+        owner_confidence:
+            ownerConfidence,
+
+        survey_confidence:
+            surveyConfidence,
+
+        area_confidence:
+            areaConfidence,
+
+        location_confidence:
+            locationConfidence
+
+    };
+
+
+    /* Saving */
+
+    document.getElementById(
+        "approved"
+    ).innerText =
+        "Saving record to database...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:8000/approve",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            approvedRecord
+                        )
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server returned error: " +
+                response.status
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Database response:",
+            result
+        );
+
+
+        /* Success */
+
+        document.getElementById(
+            "approved"
+        ).innerText =
+            "Record Approved & Saved! ID: " +
+            result.record_id;
+
+
+        /* Validation */
+
+        const validationBox =
+            document.getElementById(
+                "validation"
+            );
+
+
+        validationBox.innerText =
+            "Human Verified, Approved & Saved";
+
+
+        validationBox.className =
+            "status-box success";
+
+
+        /* Automatically refresh records */
+
+        loadRecords();
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        document.getElementById(
+            "approved"
+        ).innerText =
+            "Could not save record";
+
+
+        alert(
+            "Could not save the record.\n\n" +
+            "Make sure FastAPI is running."
+        );
+
+    }
+
+}
+
+
+
+/* =========================================
+   LOAD SAVED RECORDS
+========================================= */
+
+async function loadRecords() {
+
+
+    const tableBody =
+        document.getElementById(
+            "recordsBody"
+        );
+
+
+    tableBody.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="6"
+                style="
+                    padding:20px;
+                    text-align:center;
+                "
+            >
+
+                Loading records...
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:8000/records"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server error: " +
+                response.status
+            );
+
+        }
+
+
+        const records =
+            await response.json();
+
+
+        if (records.length === 0) {
+
+            tableBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        style="
+                            padding:20px;
+                            text-align:center;
+                            color:#666;
+                        "
+                    >
+
+                        No saved records yet.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        tableBody.innerHTML = "";
+
+
+        records.forEach(
+            record => {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${record.id}
+                    </td>
+
+                    <td>
+                        ${record.owner_name}
+                    </td>
+
+                    <td>
+                        ${record.survey_number}
+                    </td>
+
+                    <td>
+                        ${record.land_area}
+                    </td>
+
+                    <td>
+                        ${record.location}
+                    </td>
+
+                    <td
+                        class="approved-status"
+                    >
+                         ${record.status}
+                    </td>
+
+                `;
+
+
+                tableBody.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+
+        tableBody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="6"
+                    style="
+                        padding:20px;
+                        text-align:center;
+                        color:#dc2626;
+                    "
+                >
+
+                    Could not load records.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>
